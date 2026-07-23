@@ -5,17 +5,33 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.application.interfaces.ports import RefreshTokenStore
+from app.application.interfaces.ports import EventBus, RefreshTokenStore
 from app.domain.shared.domain_event import DomainEvent
 from app.infra.models.models import RefreshTokenModel
+from app.infra.workers.celery_app import process_domain_event_task
 
 logger = logging.getLogger(__name__)
 
 
-class InMemoryEventBus:
+class InMemoryEventBus(EventBus):
     async def publish(self, events: list[DomainEvent]) -> None:
         for event in events:
             logger.info("domain_event", extra={"event": event.event_name, "aggregate_id": str(event.aggregate_id)})
+
+
+class CeleryEventBus(EventBus):
+    async def publish(self, events: list[DomainEvent]) -> None:
+        for event in events:
+            payload = {
+                k: str(v) if not isinstance(v, (str, int, float, bool, type(None))) else v
+                for k, v in event.__dict__.items()
+                if k != "occurred_at"
+            }
+            try:
+                process_domain_event_task.delay(event.event_name, str(event.aggregate_id), payload)
+            except Exception:
+                logger.exception("Failed to queue event, falling back to log")
+                logger.info("domain_event", extra={"event": event.event_name, "aggregate_id": str(event.aggregate_id)})
 
 
 class SqlAlchemyRefreshTokenStore(RefreshTokenStore):

@@ -108,3 +108,60 @@ class OrderOutput(BaseModel):
     shipping_cost: str
     total: str
     items: list[CartItemOutput]
+
+
+class CouponOutput(BaseModel):
+    id: str
+    code: str
+    discount_type: str
+    discount_value: int
+    is_active: bool
+
+
+class CreateCouponInput(BaseModel):
+    code: str = Field(min_length=3, max_length=30)
+    discount_type: str = Field(pattern="^(percent|fixed)$")
+    discount_value: int = Field(ge=1)
+    min_order_amount: str = "0.00"
+    max_uses: int | None = None
+
+
+class UpdateInventoryInput(BaseModel):
+    product_id: str
+    sku: str
+    quantity: int = Field(ge=0)
+    low_stock_threshold: int = Field(default=5, ge=0)
+
+
+class CreatePaymentInput(BaseModel):
+    order_id: str
+    method: str = Field(pattern="^(pix|credit_card|boleto)$")
+    provider: str = Field(default="mock", pattern="^(mock|mercado_pago|stripe)$")
+
+
+class PaymentOutput(BaseModel):
+    id: str
+    order_id: str
+    status: str
+    provider: str
+    method: str
+    amount: str
+    checkout_url: str | None = None
+
+
+class DashboardReportOutput(BaseModel):
+    total_sales: str
+    orders_count: int
+    customers_count: int
+    low_stock_count: int
+    average_ticket: str
+    conversion_rate: str
+
+
+class MfaEnrollOutput(BaseModel):
+    secret: str
+    provisioning_uri: str
+
+
+class MfaVerifyInput(BaseModel):
+    code: str = Field(min_length=6, max_length=6)

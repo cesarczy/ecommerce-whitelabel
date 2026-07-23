@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Protocol
 from uuid import UUID
@@ -16,11 +17,68 @@ class EventBus(ABC):
     async def publish(self, events: list[DomainEvent]) -> None: ...
 
 
+class StoragePort(ABC):
+    @abstractmethod
+    async def upload(self, *, key: str, data: bytes, content_type: str) -> str: ...
+
+    @abstractmethod
+    async def get_presigned_url(self, *, key: str, expires_seconds: int = 3600) -> str: ...
+
+    @abstractmethod
+    async def delete(self, *, key: str) -> None: ...
+
+
+@dataclass
+class PaymentGatewayRequest:
+    order_id: UUID
+    amount_cents: int
+    currency: str
+    method: str
+    customer_email: str
+    description: str
+
+
+@dataclass
+class PaymentGatewayResponse:
+    external_id: str
+    checkout_url: str | None
+    status: str
+    raw: dict
+
+
+class PaymentGatewayPort(ABC):
+    @abstractmethod
+    async def create_payment(self, request: PaymentGatewayRequest) -> PaymentGatewayResponse: ...
+
+    @abstractmethod
+    async def get_payment_status(self, external_id: str) -> str: ...
+
+
+class OAuthUserInfo:
+    def __init__(self, provider: str, provider_user_id: str, email: str, name: str) -> None:
+        self.provider = provider
+        self.provider_user_id = provider_user_id
+        self.email = email
+        self.name = name
+
+
+class OAuthProviderPort(ABC):
+    @abstractmethod
+    def get_authorization_url(self, *, state: str) -> str: ...
+
+    @abstractmethod
+    async def exchange_code(self, code: str) -> OAuthUserInfo: ...
+
+
 class UnitOfWork(ABC):
     users: "UserRepository"
     products: "ProductRepository"
     carts: "CartRepository"
     orders: "OrderRepository"
+    payments: "PaymentRepository"
+    coupons: "CouponRepository"
+    inventory: "InventoryRepository"
+    tenants: "TenantRepository"
 
     @abstractmethod
     async def commit(self) -> None: ...
@@ -30,6 +88,17 @@ class UnitOfWork(ABC):
 
     async def __aenter__(self) -> "UnitOfWork": ...
     async def __aexit__(self, exc_type, exc, tb) -> None: ...
+
+
+class TenantRepository(ABC):
+    @abstractmethod
+    async def save(self, tenant) -> None: ...
+
+    @abstractmethod
+    async def find_by_slug(self, slug: str): ...
+
+    @abstractmethod
+    async def find_by_id(self, tenant_id: UUID): ...
 
 
 class UserRepository(ABC):
@@ -85,6 +154,45 @@ class OrderRepository(ABC):
     async def find_by_customer_id(self, customer_id: UUID, *, limit: int = 20) -> list: ...
 
 
+class PaymentRepository(ABC):
+    @abstractmethod
+    async def save(self, payment) -> None: ...
+
+    @abstractmethod
+    async def find_by_id(self, payment_id: UUID): ...
+
+    @abstractmethod
+    async def find_by_order_id(self, order_id: UUID): ...
+
+    @abstractmethod
+    async def find_by_external_id(self, external_id: str): ...
+
+
+class CouponRepository(ABC):
+    @abstractmethod
+    async def save(self, coupon) -> None: ...
+
+    @abstractmethod
+    async def find_by_code(self, code: str): ...
+
+    @abstractmethod
+    async def find_by_id(self, coupon_id: UUID): ...
+
+    @abstractmethod
+    async def list_active(self) -> list: ...
+
+
+class InventoryRepository(ABC):
+    @abstractmethod
+    async def save(self, item) -> None: ...
+
+    @abstractmethod
+    async def find_by_sku(self, sku: str): ...
+
+    @abstractmethod
+    async def find_low_stock(self) -> list: ...
+
+
 class PasswordHasher(ABC):
     @abstractmethod
     def hash(self, plain_password: str) -> str: ...
@@ -123,3 +231,14 @@ class RefreshTokenStore(ABC):
 
     @abstractmethod
     async def is_valid(self, user_id: UUID, token: str) -> bool: ...
+
+
+class MfaService(ABC):
+    @abstractmethod
+    def generate_secret(self) -> str: ...
+
+    @abstractmethod
+    def get_provisioning_uri(self, *, secret: str, email: str) -> str: ...
+
+    @abstractmethod
+    def verify_code(self, *, secret: str, code: str) -> bool: ...
