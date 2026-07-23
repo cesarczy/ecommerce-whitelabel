@@ -29,7 +29,9 @@ import { CartState } from '@core/state/cart.state';
       <span class="flex-1"></span>
       @if (isAuth$ | async) {
         <a mat-button routerLink="/profile">Perfil</a>
-        <a mat-button routerLink="/admin">Admin</a>
+        @if (isStaffOrAdmin$ | async) {
+          <a mat-button routerLink="/admin">Admin</a>
+        }
         <button mat-button (click)="logout()">Sair</button>
       } @else {
         <a mat-button routerLink="/login">Entrar</a>
@@ -44,6 +46,7 @@ import { CartState } from '@core/state/cart.state';
 export class LayoutComponent {
   private readonly store = inject(Store);
   readonly isAuth$ = this.store.select(AuthState.isAuthenticated);
+  readonly isStaffOrAdmin$ = this.store.select(AuthState.isStaffOrAdmin);
   readonly itemCount$ = this.store.select(CartState.itemCount);
 
   logout(): void {

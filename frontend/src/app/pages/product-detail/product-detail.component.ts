@@ -1,6 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CurrencyPipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { Store } from '@ngxs/store';
@@ -12,7 +11,7 @@ import { AuthState } from '@core/state/auth.state';
 
 @Component({
   standalone: true,
-  imports: [RouterLink, CurrencyPipe, MatCardModule, MatButtonModule],
+  imports: [RouterLink, MatCardModule, MatButtonModule],
   template: `
     @if (product(); as p) {
       <mat-card class="p-6 max-w-3xl">
@@ -74,9 +73,10 @@ export class ProductDetailComponent implements OnInit {
   }
 
   toggleFavorite(product: ProductResponse): void {
-    const req = this.favorited()
-      ? this.api.removeFavorite(product.id)
-      : this.api.addFavorite(product.id);
-    req.subscribe({ next: () => this.favorited.update((v) => !v) });
+    if (this.favorited()) {
+      this.api.removeFavorite(product.id).subscribe({ next: () => this.favorited.set(false) });
+    } else {
+      this.api.addFavorite(product.id).subscribe({ next: () => this.favorited.set(true) });
+    }
   }
 }

@@ -11,6 +11,7 @@ from app.api.deps import (
     get_upload_image,
     get_user_profile,
     get_verify_mfa,
+    require_staff,
 )
 from app.application.commands.phase2 import (
     CreateCouponUseCase,
@@ -34,7 +35,7 @@ from app.application.dto.schemas import (
 router = APIRouter(tags=["Phase 2"])
 
 
-@router.post("/coupons", response_model=CouponOutput, status_code=201)
+@router.post("/coupons", response_model=CouponOutput, status_code=201, dependencies=[Depends(require_staff)])
 async def create_coupon(
     data: CreateCouponInput,
     use_case: CreateCouponUseCase = Depends(get_create_coupon),
@@ -42,7 +43,7 @@ async def create_coupon(
     return await use_case.execute(data)
 
 
-@router.put("/inventory")
+@router.put("/inventory", dependencies=[Depends(require_staff)])
 async def update_inventory(
     data: UpdateInventoryInput,
     use_case: UpdateInventoryUseCase = Depends(get_update_inventory),
@@ -61,7 +62,7 @@ async def create_payment(
     return await use_case.execute(data, customer_email=profile.email)
 
 
-@router.post("/products/{product_id}/upload")
+@router.post("/products/{product_id}/upload", dependencies=[Depends(require_staff)])
 async def upload_product_image(
     product_id: UUID,
     file: UploadFile = File(...),

@@ -1,9 +1,7 @@
 from collections.abc import AsyncGenerator
-from typing import Annotated
 from uuid import UUID
 
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.application.commands.auth import LoginUserUseCase, RefreshTokenUseCase, RegisterUserUseCase
@@ -53,6 +51,7 @@ from app.application.queries.store import (
 from app.core.config.settings import settings
 from app.core.database.session import get_session
 from app.core.security.jwt import JWTTokenService
+from app.core.security.authorization import get_current_user_id, get_optional_user_id, require_admin, require_staff
 from app.core.security.mfa import TotpMfaService
 from app.core.security.password import Argon2PasswordHasher
 from app.infra.payments.gateways import get_payment_gateway
@@ -60,7 +59,6 @@ from app.infra.services.event_bus import CeleryEventBus, InMemoryEventBus
 from app.infra.services.unit_of_work import SqlAlchemyUnitOfWork
 from app.infra.storage.storage_factory import get_storage_adapter
 
-security = HTTPBearer(auto_error=False)
 _password_hasher = Argon2PasswordHasher()
 _token_service = JWTTokenService()
 _mfa_service = TotpMfaService()
@@ -239,27 +237,3 @@ def get_request_email_verification(uow: SqlAlchemyUnitOfWork = Depends(get_uow))
 
 def get_verify_email(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> VerifyEmailUseCase:
     return VerifyEmailUseCase(uow, _event_bus)
-
-
-async def get_optional_user_id(
-    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(security)],
-) -> UUID | None:
-    if credentials is None:
-        return None
-    try:
-        payload = _token_service.verify_access_token(credentials.credentials)
-    except ValueError:
-        return None
-    return UUID(payload["sub"])
-
-
-async def get_current_user_id(
-    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(security)],
-) -> UUID:
-    if credentials is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
-    try:
-        payload = _token_service.verify_access_token(credentials.credentials)
-    except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token") from exc
-    return UUID(payload["sub"])

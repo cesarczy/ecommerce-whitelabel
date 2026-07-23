@@ -47,6 +47,12 @@ export class AuthState {
     return state.user;
   }
 
+  @Selector()
+  static isStaffOrAdmin(state: AuthStateModel): boolean {
+    const roles = state.user?.roles ?? [];
+    return roles.includes('admin') || roles.includes('staff');
+  }
+
   @Action(Login)
   login(ctx: StateContext<AuthStateModel>, action: Login) {
     return this.api.login({ email: action.email, password: action.password }).pipe(

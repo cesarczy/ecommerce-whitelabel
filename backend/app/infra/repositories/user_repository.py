@@ -83,3 +83,26 @@ async def seed_default_roles(session: AsyncSession) -> None:
             session.add(
                 RoleModel(id=role.id.value, name=role.name, permissions=role.permissions)
             )
+
+
+async def seed_default_admin(session: AsyncSession) -> None:
+    from app.core.config.settings import settings
+    from app.core.security.password import Argon2PasswordHasher
+
+    if not settings.seed_admin_enabled:
+        return
+
+    email = settings.seed_admin_email.lower()
+    result = await session.execute(select(UserModel.id).where(UserModel.email == email))
+    if result.scalar_one_or_none() is not None:
+        return
+
+    user = User.create(
+        email=email,
+        full_name=settings.seed_admin_name,
+        password_hash=Argon2PasswordHasher().hash(settings.seed_admin_password),
+        roles=[ADMIN_ROLE],
+    )
+    user.verify_email()
+    repo = SqlAlchemyUserRepository(session)
+    await repo.save(user)

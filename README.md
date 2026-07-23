@@ -32,6 +32,10 @@ npm start
 - API: http://localhost:8000/docs  
 - App: http://localhost:4200
 
+**Admin (seed dev):** `admin@ecommerce.local` / `Admin123!` — configurável em `backend/.env` (`SEED_ADMIN_*`).
+
+Usuários com role `customer` não acessam `/admin` (guard no frontend + API 403).
+
 ## Estrutura
 
 ```

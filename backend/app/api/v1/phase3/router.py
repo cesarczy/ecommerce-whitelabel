@@ -12,6 +12,7 @@ from app.api.deps import (
     get_product_reviews_query,
     get_store_query,
     get_update_store,
+    require_staff,
 )
 from app.application.commands.phase3 import (
     CreateReviewUseCase,
@@ -86,10 +87,9 @@ async def get_store_settings(query: GetStoreSettingsQuery = Depends(get_store_qu
     return await query.execute()
 
 
-@router.put("/store/settings", response_model=StoreSettingsOutput)
+@router.put("/store/settings", response_model=StoreSettingsOutput, dependencies=[Depends(require_staff)])
 async def update_store_settings(
     data: UpdateStoreInput,
-    _user_id: UUID = Depends(get_current_user_id),
     use_case: UpdateStoreSettingsUseCase = Depends(get_update_store),
 ):
     return await use_case.execute(data)

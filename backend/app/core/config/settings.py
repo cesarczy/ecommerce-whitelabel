@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     github_client_id: str = ""
     github_client_secret: str = ""
     oauth_redirect_uri: str = "http://localhost:8000/api/v1/auth/oauth/callback"
+    seed_admin_enabled: bool = True
+    seed_admin_email: str = "admin@ecommerce.local"
+    seed_admin_password: str = "Admin123!"
+    seed_admin_name: str = "Administrador"
     storage_provider: str = "minio"
     r2_account_id: str = ""
     r2_access_key_id: str = ""

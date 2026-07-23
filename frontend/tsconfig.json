@@ -20,7 +20,8 @@
       "@core/*": ["src/app/core/*"],
       "@shared/*": ["src/app/shared/*"],
       "@pages/*": ["src/app/pages/*"],
-      "@admin/*": ["src/app/admin/*"]
+      "@admin/*": ["src/app/admin/*"],
+      "@layout/*": ["src/app/layout/*"]
     }
   }
 }

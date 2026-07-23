@@ -15,6 +15,7 @@ from app.api.deps import (
     get_related_products,
     get_remove_favorite,
     get_update_product_seo,
+    require_staff,
 )
 from app.application.commands.phase4 import (
     AddFavoriteUseCase,
@@ -83,29 +84,26 @@ async def related_products(
     return await use_case.execute(product_id)
 
 
-@router.put("/products/{product_id}/seo", response_model=ProductOutput)
+@router.put("/products/{product_id}/seo", response_model=ProductOutput, dependencies=[Depends(require_staff)])
 async def update_product_seo(
     product_id: UUID,
     data: UpdateProductSeoInput,
-    _user_id: UUID = Depends(get_current_user_id),
     use_case: UpdateProductSeoUseCase = Depends(get_update_product_seo),
 ):
     return await use_case.execute(product_id, data)
 
 
-@router.post("/admin/banners", response_model=BannerOutput, status_code=201)
+@router.post("/admin/banners", response_model=BannerOutput, status_code=201, dependencies=[Depends(require_staff)])
 async def create_banner(
     data: CreateBannerInput,
-    _user_id: UUID = Depends(get_current_user_id),
     use_case: CreateBannerUseCase = Depends(get_create_banner),
 ):
     return await use_case.execute(data)
 
 
-@router.delete("/admin/banners/{banner_id}")
+@router.delete("/admin/banners/{banner_id}", dependencies=[Depends(require_staff)])
 async def delete_banner(
     banner_id: UUID,
-    _user_id: UUID = Depends(get_current_user_id),
     use_case: DeleteBannerUseCase = Depends(get_delete_banner),
 ):
     return await use_case.execute(banner_id)
@@ -116,12 +114,11 @@ async def list_banners_presigned(use_case: ListBannersWithUrlsUseCase = Depends(
     return await use_case.execute()
 
 
-@router.post("/products/{product_id}/videos", response_model=ProductVideoOutput, status_code=201)
+@router.post("/products/{product_id}/videos", response_model=ProductVideoOutput, status_code=201, dependencies=[Depends(require_staff)])
 async def add_product_video(
     product_id: UUID,
     storage_key: str = Query(...),
     title: str = Query(""),
-    _user_id: UUID = Depends(get_current_user_id),
     use_case: AddProductVideoUseCase = Depends(get_add_product_video),
 ):
     return await use_case.execute(product_id, storage_key=storage_key, title=title)
