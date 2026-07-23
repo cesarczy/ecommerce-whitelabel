@@ -66,6 +66,8 @@ class ProductOutput(BaseModel):
     status: str
     category_id: str
     image_url: str | None = None
+    seo_title: str | None = None
+    seo_description: str | None = None
 
 
 class AddToCartInput(BaseModel):
@@ -210,3 +212,51 @@ class BannerOutput(BaseModel):
     image_url: str
     link_url: str | None
     sort_order: int
+
+
+class CreateBannerInput(BaseModel):
+    title: str = Field(min_length=2, max_length=200)
+    image_key: str = Field(min_length=3, max_length=500)
+    link_url: str | None = None
+    sort_order: int = 0
+
+
+class FavoriteOutput(BaseModel):
+    id: str
+    product_id: str
+
+
+class UpdateProductSeoInput(BaseModel):
+    seo_title: str | None = Field(default=None, max_length=200)
+    seo_description: str | None = Field(default=None, max_length=300)
+
+
+class ProductVideoOutput(BaseModel):
+    id: str
+    product_id: str
+    storage_key: str
+    title: str
+
+
+class ForgotPasswordInput(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordInput(BaseModel):
+    token: str = Field(min_length=20)
+    new_password: str = Field(min_length=8, max_length=128)
+
+
+class VerifyEmailInput(BaseModel):
+    token: str = Field(min_length=20)
+
+
+class AnalyticsReportOutput(BaseModel):
+    total_sales: str
+    orders_count: int
+    carts_count: int
+    customers_count: int
+    favorites_count: int
+    reviews_count: int
+    average_ticket: str
+    conversion_rate: str

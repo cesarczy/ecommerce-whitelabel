@@ -65,9 +65,13 @@ ecommerce-whitelabel/
 
 Validação: `./harness/scripts/run-harness.sh`
 
-## Fase 2
+## Fases
 
-Ver [`docs/phase2.md`](docs/phase2.md) — pagamentos, cupons, estoque, MinIO, MFA, OAuth2, Celery, multi-tenant, dashboard CQRS.
+| Fase | Doc |
+|------|-----|
+| 2 | [`docs/phase2.md`](docs/phase2.md) — pagamentos, cupons, MFA, multi-tenant |
+| 3 | [`docs/phase3.md`](docs/phase3.md) — webhooks, reviews, store settings |
+| 4 | [`docs/phase4.md`](docs/phase4.md) — favoritos, SEO, auth e-mail, R2, analytics |
 
 ## Arquitetura backend
 

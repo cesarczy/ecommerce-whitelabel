@@ -81,6 +81,10 @@ class UnitOfWork(ABC):
     tenants: "TenantRepository"
     reviews: "ReviewRepository"
     stores: "StoreRepository"
+    favorites: "FavoriteRepository"
+    banners: "BannerRepository"
+    user_tokens: "UserTokenRepository"
+    product_videos: "ProductVideoRepository"
 
     @abstractmethod
     async def commit(self) -> None: ...
@@ -129,6 +133,9 @@ class ProductRepository(ABC):
 
     @abstractmethod
     async def list_active(self, *, offset: int = 0, limit: int = 20) -> list: ...
+
+    @abstractmethod
+    async def list_by_category(self, category_id: UUID, *, exclude_id: UUID | None = None, limit: int = 6) -> list: ...
 
 
 class CartRepository(ABC):
@@ -209,6 +216,53 @@ class StoreRepository(ABC):
 
     @abstractmethod
     async def find_by_tenant_id(self, tenant_id: UUID): ...
+
+
+class FavoriteRepository(ABC):
+    @abstractmethod
+    async def add(self, favorite) -> None: ...
+
+    @abstractmethod
+    async def remove(self, user_id: UUID, product_id: UUID) -> None: ...
+
+    @abstractmethod
+    async def list_by_user(self, user_id: UUID) -> list: ...
+
+    @abstractmethod
+    async def exists(self, user_id: UUID, product_id: UUID) -> bool: ...
+
+
+class BannerRepository(ABC):
+    @abstractmethod
+    async def save(self, banner) -> None: ...
+
+    @abstractmethod
+    async def find_by_id(self, banner_id: UUID): ...
+
+    @abstractmethod
+    async def delete(self, banner_id: UUID) -> None: ...
+
+    @abstractmethod
+    async def list_active(self, tenant_id: UUID) -> list: ...
+
+
+class UserTokenRepository(ABC):
+    @abstractmethod
+    async def create(self, *, user_id: UUID, token: str, token_type: str, expires_at: datetime) -> None: ...
+
+    @abstractmethod
+    async def find_user_by_token(self, token: str, token_type: str): ...
+
+    @abstractmethod
+    async def invalidate(self, token: str) -> None: ...
+
+
+class ProductVideoRepository(ABC):
+    @abstractmethod
+    async def save(self, video) -> None: ...
+
+    @abstractmethod
+    async def list_by_product(self, product_id: UUID) -> list: ...
 
 
 class PasswordHasher(ABC):

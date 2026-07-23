@@ -31,6 +31,22 @@ class RegisterUserUseCase:
         events = user.collect_events()
         await self._uow.commit()
         await self._event_bus.publish(events)
+        from app.infra.notifications.email_notifier import queue_email
+        from app.infra.repositories.phase4_repositories import generate_secure_token, token_expiry
+
+        token = generate_secure_token()
+        await self._uow.user_tokens.create(
+            user_id=user.id.value,
+            token=token,
+            token_type="email_verification",
+            expires_at=token_expiry(hours=48),
+        )
+        await self._uow.commit()
+        queue_email(
+            to=str(user.email),
+            subject="Confirme seu e-mail",
+            body=f"Use o token: {token} em POST /api/v1/auth/verify-email",
+        )
         return _to_user_output(user)
 
 

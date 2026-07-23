@@ -25,9 +25,15 @@ class FakeUserRepo:
         return email.lower() in self._emails
 
 
+class FakeUserTokenRepo:
+    async def create(self, *, user_id, token, token_type, expires_at) -> None:
+        pass
+
+
 class FakeUoW:
     def __init__(self) -> None:
         self.users = FakeUserRepo()
+        self.user_tokens = FakeUserTokenRepo()
 
     async def commit(self) -> None:
         pass

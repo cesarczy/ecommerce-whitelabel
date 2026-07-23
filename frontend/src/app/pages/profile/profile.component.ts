@@ -17,9 +17,13 @@ import { AuthState } from '@core/state/auth.state';
         <p><strong>Nome:</strong> {{ user.full_name }}</p>
         <p><strong>E-mail:</strong> {{ user.email }}</p>
         <p><strong>Roles:</strong> {{ user.roles.join(', ') }}</p>
-        <div class="flex gap-2 mt-4">
+        <div class="flex gap-2 mt-4 flex-wrap">
           <a mat-stroked-button routerLink="/orders">Meus pedidos</a>
+          <a mat-stroked-button routerLink="/favorites">Favoritos</a>
           <a mat-stroked-button routerLink="/mfa">MFA</a>
+          @if (!(user.email_verified)) {
+            <a mat-stroked-button routerLink="/verify-email">Confirmar e-mail</a>
+          }
         </div>
       </mat-card>
     }

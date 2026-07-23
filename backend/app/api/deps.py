@@ -24,7 +24,25 @@ from app.application.commands.phase3 import (
     UpdateStoreSettingsUseCase,
 )
 from app.application.commands.products import CreateProductUseCase, ListProductsUseCase, PublishProductUseCase
+from app.application.commands.phase4 import (
+    AddFavoriteUseCase,
+    AddProductVideoUseCase,
+    CreateBannerUseCase,
+    DeleteBannerUseCase,
+    GetProductBySlugUseCase,
+    GetRelatedProductsUseCase,
+    ListBannersWithUrlsUseCase,
+    ListFavoritesUseCase,
+    ListProductVideosUseCase,
+    RemoveFavoriteUseCase,
+    RequestEmailVerificationUseCase,
+    RequestPasswordResetUseCase,
+    ResetPasswordUseCase,
+    UpdateProductSeoUseCase,
+    VerifyEmailUseCase,
+)
 from app.application.commands.users import AddUserAddressUseCase, GetUserProfileUseCase
+from app.application.queries.analytics import GetAnalyticsReportQuery
 from app.application.queries.dashboard import GetDashboardReportQuery
 from app.application.queries.store import (
     GetProductRatingQuery,
@@ -40,18 +58,14 @@ from app.core.security.password import Argon2PasswordHasher
 from app.infra.payments.gateways import get_payment_gateway
 from app.infra.services.event_bus import CeleryEventBus, InMemoryEventBus
 from app.infra.services.unit_of_work import SqlAlchemyUnitOfWork
-from app.infra.storage.minio_adapter import InMemoryStorageAdapter, MinIOStorageAdapter
+from app.infra.storage.storage_factory import get_storage_adapter
 
 security = HTTPBearer(auto_error=False)
 _password_hasher = Argon2PasswordHasher()
 _token_service = JWTTokenService()
 _mfa_service = TotpMfaService()
 _event_bus = CeleryEventBus() if settings.use_celery_events else InMemoryEventBus()
-
-try:
-    _storage = MinIOStorageAdapter()
-except Exception:
-    _storage = InMemoryStorageAdapter()
+_storage = get_storage_adapter()
 
 
 async def get_uow(session: AsyncSession = Depends(get_session)) -> AsyncGenerator[SqlAlchemyUnitOfWork, None]:
@@ -161,6 +175,70 @@ def get_create_review(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> CreateRev
 
 def get_update_store(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> UpdateStoreSettingsUseCase:
     return UpdateStoreSettingsUseCase(uow, _event_bus)
+
+
+def get_analytics_query(session: AsyncSession = Depends(get_session)) -> GetAnalyticsReportQuery:
+    return GetAnalyticsReportQuery(session)
+
+
+def get_add_favorite(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> AddFavoriteUseCase:
+    return AddFavoriteUseCase(uow)
+
+
+def get_remove_favorite(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> RemoveFavoriteUseCase:
+    return RemoveFavoriteUseCase(uow)
+
+
+def get_list_favorites(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> ListFavoritesUseCase:
+    return ListFavoritesUseCase(uow)
+
+
+def get_update_product_seo(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> UpdateProductSeoUseCase:
+    return UpdateProductSeoUseCase(uow, _event_bus)
+
+
+def get_related_products(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> GetRelatedProductsUseCase:
+    return GetRelatedProductsUseCase(uow)
+
+
+def get_product_by_slug(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> GetProductBySlugUseCase:
+    return GetProductBySlugUseCase(uow)
+
+
+def get_create_banner(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> CreateBannerUseCase:
+    return CreateBannerUseCase(uow)
+
+
+def get_delete_banner(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> DeleteBannerUseCase:
+    return DeleteBannerUseCase(uow)
+
+
+def get_banners_with_urls(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> ListBannersWithUrlsUseCase:
+    return ListBannersWithUrlsUseCase(uow, _storage)
+
+
+def get_add_product_video(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> AddProductVideoUseCase:
+    return AddProductVideoUseCase(uow)
+
+
+def get_list_product_videos(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> ListProductVideosUseCase:
+    return ListProductVideosUseCase(uow, _storage)
+
+
+def get_forgot_password(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> RequestPasswordResetUseCase:
+    return RequestPasswordResetUseCase(uow)
+
+
+def get_reset_password(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> ResetPasswordUseCase:
+    return ResetPasswordUseCase(uow, _password_hasher)
+
+
+def get_request_email_verification(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> RequestEmailVerificationUseCase:
+    return RequestEmailVerificationUseCase(uow)
+
+
+def get_verify_email(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> VerifyEmailUseCase:
+    return VerifyEmailUseCase(uow, _event_bus)
 
 
 async def get_optional_user_id(

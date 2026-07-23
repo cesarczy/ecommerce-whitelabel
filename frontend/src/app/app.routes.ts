@@ -19,6 +19,10 @@ export const routes: Routes = [
     loadComponent: () => import('@pages/products/products.component').then((m) => m.ProductsComponent),
   },
   {
+    path: 'products/:slug',
+    loadComponent: () => import('@pages/product-detail/product-detail.component').then((m) => m.ProductDetailComponent),
+  },
+  {
     path: 'cart',
     loadComponent: () => import('@pages/cart/cart.component').then((m) => m.CartComponent),
   },
@@ -41,6 +45,24 @@ export const routes: Routes = [
     path: 'mfa',
     canActivate: [authGuard],
     loadComponent: () => import('@pages/mfa/mfa.component').then((m) => m.MfaComponent),
+  },
+  {
+    path: 'favorites',
+    canActivate: [authGuard],
+    loadComponent: () => import('@pages/favorites/favorites.component').then((m) => m.FavoritesComponent),
+  },
+  {
+    path: 'forgot-password',
+    loadComponent: () => import('@pages/forgot-password/forgot-password.component').then((m) => m.ForgotPasswordComponent),
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('@pages/reset-password/reset-password.component').then((m) => m.ResetPasswordComponent),
+  },
+  {
+    path: 'verify-email',
+    canActivate: [authGuard],
+    loadComponent: () => import('@pages/verify-email/verify-email.component').then((m) => m.VerifyEmailComponent),
   },
   {
     path: 'admin',

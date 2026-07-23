@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -11,7 +12,7 @@ import { CartState, SetCart } from '@core/state/cart.state';
 
 @Component({
   standalone: true,
-  imports: [CurrencyPipe, MatCardModule, MatButtonModule, MatProgressSpinnerModule],
+  imports: [CurrencyPipe, MatCardModule, MatButtonModule, MatProgressSpinnerModule, RouterLink],
   template: `
     <h2 class="text-2xl font-medium mb-4">Catálogo</h2>
     @if (loading()) {
@@ -25,7 +26,10 @@ import { CartState, SetCart } from '@core/state/cart.state';
             <h3 class="font-medium">{{ product.name }}</h3>
             <p class="text-sm text-gray-600 line-clamp-2 mb-2">{{ product.description }}</p>
             <p class="text-lg font-semibold mb-3">R$ {{ product.price }}</p>
-            <button mat-raised-button color="primary" (click)="addToCart(product)">Adicionar</button>
+            <div class="flex gap-2">
+              <a mat-stroked-button [routerLink]="['/products', product.slug]">Detalhes</a>
+              <button mat-raised-button color="primary" (click)="addToCart(product)">Adicionar</button>
+            </div>
           </mat-card>
         }
       </div>

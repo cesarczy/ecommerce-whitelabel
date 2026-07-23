@@ -1,9 +1,34 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from uuid import uuid4
+from uuid import UUID, uuid4
 
-from app.api.deps import get_login_user, get_refresh_token, get_register_user, get_uow
+from app.api.deps import (
+    get_forgot_password,
+    get_login_user,
+    get_refresh_token,
+    get_register_user,
+    get_request_email_verification,
+    get_reset_password,
+    get_verify_email,
+    get_current_user_id,
+    get_uow,
+)
 from app.application.commands.auth import LoginUserUseCase, RefreshTokenUseCase, RegisterUserUseCase
-from app.application.dto.schemas import LoginUserInput, RefreshTokenInput, RegisterUserInput, TokenOutput, UserOutput
+from app.application.commands.phase4 import (
+    RequestEmailVerificationUseCase,
+    RequestPasswordResetUseCase,
+    ResetPasswordUseCase,
+    VerifyEmailUseCase,
+)
+from app.application.dto.schemas import (
+    ForgotPasswordInput,
+    LoginUserInput,
+    RefreshTokenInput,
+    RegisterUserInput,
+    ResetPasswordInput,
+    TokenOutput,
+    UserOutput,
+    VerifyEmailInput,
+)
 from app.core.security.jwt import JWTTokenService
 from app.domain.users.entities.user import User
 from app.infra.providers.oauth_providers import GitHubOAuthProvider, GoogleOAuthProvider
@@ -67,3 +92,29 @@ async def login(data: LoginUserInput, use_case: LoginUserUseCase = Depends(get_l
 @router.post("/refresh", response_model=TokenOutput)
 async def refresh(data: RefreshTokenInput, use_case: RefreshTokenUseCase = Depends(get_refresh_token)):
     return await use_case.execute(data.refresh_token)
+
+
+@router.post("/forgot-password")
+async def forgot_password(
+    data: ForgotPasswordInput,
+    use_case: RequestPasswordResetUseCase = Depends(get_forgot_password),
+):
+    return await use_case.execute(str(data.email))
+
+
+@router.post("/reset-password")
+async def reset_password(data: ResetPasswordInput, use_case: ResetPasswordUseCase = Depends(get_reset_password)):
+    return await use_case.execute(data)
+
+
+@router.post("/verify-email")
+async def verify_email(data: VerifyEmailInput, use_case: VerifyEmailUseCase = Depends(get_verify_email)):
+    return await use_case.execute(data)
+
+
+@router.post("/resend-verification")
+async def resend_verification(
+    user_id: UUID = Depends(get_current_user_id),
+    use_case: RequestEmailVerificationUseCase = Depends(get_request_email_verification),
+):
+    return await use_case.execute(user_id)

@@ -27,6 +27,8 @@ export interface ProductResponse {
   status: string;
   category_id: string;
   image_url: string | null;
+  seo_title?: string | null;
+  seo_description?: string | null;
 }
 
 export interface CartResponse {
@@ -94,4 +96,23 @@ export interface StoreSettingsResponse {
 export interface MfaEnrollResponse {
   secret: string;
   provisioning_uri: string;
+}
+
+export interface BannerResponse {
+  id: string;
+  title: string;
+  image_url: string;
+  link_url: string | null;
+  sort_order: number;
+}
+
+export interface AnalyticsResponse {
+  total_sales: string;
+  orders_count: number;
+  carts_count: number;
+  customers_count: number;
+  favorites_count: number;
+  reviews_count: number;
+  average_ticket: string;
+  conversion_rate: string;
 }

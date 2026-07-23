@@ -26,6 +26,12 @@ class Settings(BaseSettings):
     github_client_id: str = ""
     github_client_secret: str = ""
     oauth_redirect_uri: str = "http://localhost:8000/api/v1/auth/oauth/callback"
+    storage_provider: str = "minio"
+    r2_account_id: str = ""
+    r2_access_key_id: str = ""
+    r2_secret_access_key: str = ""
+    r2_bucket: str = "ecommerce"
+    r2_endpoint: str = ""
 
     @property
     def cors_origin_list(self) -> list[str]:

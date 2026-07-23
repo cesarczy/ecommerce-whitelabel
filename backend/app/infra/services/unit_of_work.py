@@ -6,6 +6,12 @@ from app.infra.repositories.inventory_repository import SqlAlchemyInventoryRepos
 from app.infra.repositories.order_repository import SqlAlchemyCartRepository, SqlAlchemyOrderRepository
 from app.infra.repositories.payment_repository import SqlAlchemyPaymentRepository
 from app.infra.repositories.product_repository import SqlAlchemyProductRepository
+from app.infra.repositories.phase4_repositories import (
+    SqlAlchemyBannerRepository,
+    SqlAlchemyFavoriteRepository,
+    SqlAlchemyProductVideoRepository,
+    SqlAlchemyUserTokenRepository,
+)
 from app.infra.repositories.phase3_repositories import SqlAlchemyReviewRepository, SqlAlchemyStoreRepository
 from app.infra.repositories.tenant_repository import SqlAlchemyTenantRepository
 from app.infra.repositories.user_repository import SqlAlchemyUserRepository
@@ -25,6 +31,10 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
         self.tenants = SqlAlchemyTenantRepository(session)
         self.reviews = SqlAlchemyReviewRepository(session)
         self.stores = SqlAlchemyStoreRepository(session)
+        self.favorites = SqlAlchemyFavoriteRepository(session)
+        self.banners = SqlAlchemyBannerRepository(session)
+        self.user_tokens = SqlAlchemyUserTokenRepository(session)
+        self.product_videos = SqlAlchemyProductVideoRepository(session)
         self.refresh_tokens = SqlAlchemyRefreshTokenStore(session)
 
     async def commit(self) -> None:

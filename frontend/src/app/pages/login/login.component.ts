@@ -30,6 +30,7 @@ import { Login } from '@core/state/auth.state';
         <button mat-raised-button color="primary" [disabled]="form.invalid || loading">Entrar</button>
       </form>
       <p class="mt-4 text-sm">Não tem conta? <a routerLink="/register" class="text-indigo-600">Cadastre-se</a></p>
+      <p class="mt-2 text-sm"><a routerLink="/forgot-password" class="text-indigo-600">Esqueci minha senha</a></p>
     </mat-card>
   `,
 })

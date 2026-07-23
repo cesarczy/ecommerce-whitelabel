@@ -13,4 +13,8 @@ export const adminRoutes: Routes = [
     path: 'store',
     loadComponent: () => import('@admin/store/store-settings.component').then((m) => m.StoreSettingsComponent),
   },
+  {
+    path: 'banners',
+    loadComponent: () => import('@admin/banners/banners.component').then((m) => m.BannersComponent),
+  },
 ];

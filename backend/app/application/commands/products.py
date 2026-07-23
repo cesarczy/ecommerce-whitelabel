@@ -72,4 +72,6 @@ def _to_product_output(product: Product) -> ProductOutput:
         status=product.status.value,
         category_id=str(product.category_id.value),
         image_url=primary.storage_key if primary else None,
+        seo_title=product.seo_title,
+        seo_description=product.seo_description,
     )

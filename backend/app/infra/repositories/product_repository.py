@@ -84,3 +84,15 @@ class SqlAlchemyProductRepository(ProductRepository):
             .limit(limit)
         )
         return [product_to_domain(model) for model in result.scalars().all()]
+
+    async def list_by_category(self, category_id: UUID, *, exclude_id: UUID | None = None, limit: int = 6) -> list:
+        query = (
+            select(ProductModel)
+            .options(selectinload(ProductModel.images), selectinload(ProductModel.variations))
+            .where(ProductModel.status == ProductStatus.ACTIVE.value, ProductModel.category_id == category_id)
+        )
+        if exclude_id:
+            query = query.where(ProductModel.id != exclude_id)
+        query = query.limit(limit)
+        result = await self._session.execute(query)
+        return [product_to_domain(model) for model in result.scalars().all()]

@@ -3,7 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import {
+  AnalyticsResponse,
   API_URL,
+  BannerResponse,
   CartResponse,
   CouponResponse,
   MfaEnrollResponse,
@@ -29,12 +31,60 @@ export class ApiService {
     return this.http.post<TokenResponse>(`${this.base}/auth/login`, body);
   }
 
+  forgotPassword(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.base}/auth/forgot-password`, { email });
+  }
+
+  resetPassword(body: { token: string; new_password: string }): Observable<{ password_reset: boolean }> {
+    return this.http.post<{ password_reset: boolean }>(`${this.base}/auth/reset-password`, body);
+  }
+
+  verifyEmail(token: string): Observable<{ email_verified: boolean }> {
+    return this.http.post<{ email_verified: boolean }>(`${this.base}/auth/verify-email`, { token });
+  }
+
+  resendVerification(): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.base}/auth/resend-verification`, {});
+  }
+
   me(): Observable<UserResponse> {
     return this.http.get<UserResponse>(`${this.base}/users/me`);
   }
 
   listProducts(): Observable<ProductResponse[]> {
     return this.http.get<ProductResponse[]>(`${this.base}/products`);
+  }
+
+  getProductBySlug(slug: string): Observable<ProductResponse> {
+    return this.http.get<ProductResponse>(`${this.base}/products/slug/${slug}`);
+  }
+
+  getRelatedProducts(productId: string): Observable<ProductResponse[]> {
+    return this.http.get<ProductResponse[]>(`${this.base}/products/${productId}/related`);
+  }
+
+  addFavorite(productId: string): Observable<{ id: string; product_id: string }> {
+    return this.http.post<{ id: string; product_id: string }>(`${this.base}/favorites/${productId}`, {});
+  }
+
+  removeFavorite(productId: string): Observable<{ removed: boolean }> {
+    return this.http.delete<{ removed: boolean }>(`${this.base}/favorites/${productId}`);
+  }
+
+  listFavorites(): Observable<ProductResponse[]> {
+    return this.http.get<ProductResponse[]>(`${this.base}/favorites`);
+  }
+
+  listBanners(): Observable<BannerResponse[]> {
+    return this.http.get<BannerResponse[]>(`${this.base}/store/banners/presigned`);
+  }
+
+  createBanner(body: { title: string; image_key: string; link_url?: string; sort_order?: number }): Observable<BannerResponse> {
+    return this.http.post<BannerResponse>(`${this.base}/admin/banners`, body);
+  }
+
+  deleteBanner(bannerId: string): Observable<{ deleted: boolean }> {
+    return this.http.delete<{ deleted: boolean }>(`${this.base}/admin/banners/${bannerId}`);
   }
 
   addToCart(body: { product_id: string; sku: string; quantity: number; session_id?: string }): Observable<CartResponse> {
@@ -88,5 +138,9 @@ export class ApiService {
 
   adminDashboard(): Observable<Record<string, unknown>> {
     return this.http.get<Record<string, unknown>>(`${this.base}/admin/dashboard`);
+  }
+
+  adminAnalytics(): Observable<AnalyticsResponse> {
+    return this.http.get<AnalyticsResponse>(`${this.base}/admin/analytics`);
   }
 }
