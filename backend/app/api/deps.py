@@ -17,9 +17,21 @@ from app.application.commands.phase2 import (
     UploadProductImageUseCase,
     VerifyMfaUseCase,
 )
+from app.application.commands.phase3 import (
+    CreateReviewUseCase,
+    ListCustomerOrdersUseCase,
+    ProcessPaymentWebhookUseCase,
+    UpdateStoreSettingsUseCase,
+)
 from app.application.commands.products import CreateProductUseCase, ListProductsUseCase, PublishProductUseCase
 from app.application.commands.users import AddUserAddressUseCase, GetUserProfileUseCase
 from app.application.queries.dashboard import GetDashboardReportQuery
+from app.application.queries.store import (
+    GetProductRatingQuery,
+    GetStoreSettingsQuery,
+    ListBannersQuery,
+    ListProductReviewsQuery,
+)
 from app.core.config.settings import settings
 from app.core.database.session import get_session
 from app.core.security.jwt import JWTTokenService
@@ -117,6 +129,38 @@ def get_verify_mfa(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> VerifyMfaUse
 
 def get_dashboard_query(session: AsyncSession = Depends(get_session)) -> GetDashboardReportQuery:
     return GetDashboardReportQuery(session)
+
+
+def get_store_query(session: AsyncSession = Depends(get_session)) -> GetStoreSettingsQuery:
+    return GetStoreSettingsQuery(session)
+
+
+def get_product_reviews_query(session: AsyncSession = Depends(get_session)) -> ListProductReviewsQuery:
+    return ListProductReviewsQuery(session)
+
+
+def get_product_rating_query(session: AsyncSession = Depends(get_session)) -> GetProductRatingQuery:
+    return GetProductRatingQuery(session)
+
+
+def get_banners_query(session: AsyncSession = Depends(get_session)) -> ListBannersQuery:
+    return ListBannersQuery(session)
+
+
+def get_process_webhook(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> ProcessPaymentWebhookUseCase:
+    return ProcessPaymentWebhookUseCase(uow, _event_bus)
+
+
+def get_list_orders(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> ListCustomerOrdersUseCase:
+    return ListCustomerOrdersUseCase(uow)
+
+
+def get_create_review(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> CreateReviewUseCase:
+    return CreateReviewUseCase(uow, _event_bus)
+
+
+def get_update_store(uow: SqlAlchemyUnitOfWork = Depends(get_uow)) -> UpdateStoreSettingsUseCase:
+    return UpdateStoreSettingsUseCase(uow, _event_bus)
 
 
 async def get_optional_user_id(

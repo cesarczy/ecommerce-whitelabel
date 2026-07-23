@@ -1,13 +1,15 @@
 import { Component, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
 import { Store } from '@ngxs/store';
 
 import { AuthState } from '@core/state/auth.state';
 
 @Component({
   standalone: true,
-  imports: [AsyncPipe, MatCardModule],
+  imports: [AsyncPipe, MatCardModule, MatButtonModule, RouterLink],
   template: `
     <h2 class="text-2xl font-medium mb-4">Meu perfil</h2>
     @if (user$ | async; as user) {
@@ -15,6 +17,10 @@ import { AuthState } from '@core/state/auth.state';
         <p><strong>Nome:</strong> {{ user.full_name }}</p>
         <p><strong>E-mail:</strong> {{ user.email }}</p>
         <p><strong>Roles:</strong> {{ user.roles.join(', ') }}</p>
+        <div class="flex gap-2 mt-4">
+          <a mat-stroked-button routerLink="/orders">Meus pedidos</a>
+          <a mat-stroked-button routerLink="/mfa">MFA</a>
+        </div>
       </mat-card>
     }
   `,

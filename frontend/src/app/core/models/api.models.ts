@@ -56,3 +56,42 @@ export interface OrderResponse {
   total: string;
   items: CartItemResponse[];
 }
+
+export interface PaymentResponse {
+  id: string;
+  order_id: string;
+  status: string;
+  provider: string;
+  method: string;
+  amount: string;
+  checkout_url: string | null;
+}
+
+export interface CouponResponse {
+  id: string;
+  code: string;
+  discount_type: string;
+  discount_value: number;
+  is_active: boolean;
+}
+
+export interface ReviewResponse {
+  id: string;
+  product_id: string;
+  rating: number;
+  title: string;
+  comment: string;
+}
+
+export interface StoreSettingsResponse {
+  name: string;
+  tagline: string;
+  logo_url: string | null;
+  primary_color: string;
+  secondary_color: string;
+}
+
+export interface MfaEnrollResponse {
+  secret: string;
+  provisioning_uri: string;
+}

@@ -6,6 +6,7 @@ from app.infra.repositories.inventory_repository import SqlAlchemyInventoryRepos
 from app.infra.repositories.order_repository import SqlAlchemyCartRepository, SqlAlchemyOrderRepository
 from app.infra.repositories.payment_repository import SqlAlchemyPaymentRepository
 from app.infra.repositories.product_repository import SqlAlchemyProductRepository
+from app.infra.repositories.phase3_repositories import SqlAlchemyReviewRepository, SqlAlchemyStoreRepository
 from app.infra.repositories.tenant_repository import SqlAlchemyTenantRepository
 from app.infra.repositories.user_repository import SqlAlchemyUserRepository
 from app.infra.services.event_bus import SqlAlchemyRefreshTokenStore
@@ -22,6 +23,8 @@ class SqlAlchemyUnitOfWork(UnitOfWork):
         self.coupons = SqlAlchemyCouponRepository(session)
         self.inventory = SqlAlchemyInventoryRepository(session)
         self.tenants = SqlAlchemyTenantRepository(session)
+        self.reviews = SqlAlchemyReviewRepository(session)
+        self.stores = SqlAlchemyStoreRepository(session)
         self.refresh_tokens = SqlAlchemyRefreshTokenStore(session)
 
     async def commit(self) -> None:

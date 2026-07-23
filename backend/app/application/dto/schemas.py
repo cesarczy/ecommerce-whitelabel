@@ -165,3 +165,48 @@ class MfaEnrollOutput(BaseModel):
 
 class MfaVerifyInput(BaseModel):
     code: str = Field(min_length=6, max_length=6)
+
+
+class CreateReviewInput(BaseModel):
+    product_id: str
+    rating: int = Field(ge=1, le=5)
+    title: str = Field(default="", max_length=200)
+    comment: str = Field(min_length=3, max_length=2000)
+    order_id: str | None = None
+
+
+class ReviewOutput(BaseModel):
+    id: str
+    product_id: str
+    rating: int
+    title: str
+    comment: str
+
+
+class StoreSettingsOutput(BaseModel):
+    name: str
+    tagline: str
+    logo_url: str | None
+    primary_color: str
+    secondary_color: str
+
+
+class UpdateStoreInput(BaseModel):
+    name: str | None = Field(default=None, min_length=2, max_length=200)
+    tagline: str | None = Field(default=None, max_length=300)
+    logo_url: str | None = None
+    primary_color: str | None = None
+    secondary_color: str | None = None
+
+
+class PaymentWebhookInput(BaseModel):
+    external_id: str
+    status: str
+
+
+class BannerOutput(BaseModel):
+    id: str
+    title: str
+    image_url: str
+    link_url: str | None
+    sort_order: int

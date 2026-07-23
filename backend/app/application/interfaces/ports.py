@@ -79,6 +79,8 @@ class UnitOfWork(ABC):
     coupons: "CouponRepository"
     inventory: "InventoryRepository"
     tenants: "TenantRepository"
+    reviews: "ReviewRepository"
+    stores: "StoreRepository"
 
     @abstractmethod
     async def commit(self) -> None: ...
@@ -191,6 +193,22 @@ class InventoryRepository(ABC):
 
     @abstractmethod
     async def find_low_stock(self) -> list: ...
+
+
+class ReviewRepository(ABC):
+    @abstractmethod
+    async def save(self, review) -> None: ...
+
+    @abstractmethod
+    async def find_by_product_id(self, product_id: UUID) -> list: ...
+
+
+class StoreRepository(ABC):
+    @abstractmethod
+    async def save(self, store) -> None: ...
+
+    @abstractmethod
+    async def find_by_tenant_id(self, tenant_id: UUID): ...
 
 
 class PasswordHasher(ABC):

@@ -42,8 +42,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="E-commerce Whitelabel API",
-    description="API REST — Clean Architecture + DDD — Fase 2",
-    version="0.2.0",
+    description="API REST — Clean Architecture + DDD — Fase 3",
+    version="0.3.0",
     docs_url="/docs",
     redoc_url="/redoc",
     lifespan=lifespan,
@@ -67,4 +67,4 @@ app.include_router(api_router)
 
 @app.get("/health", tags=["Health"])
 async def health_check() -> dict[str, str]:
-    return {"status": "ok", "phase": "2"}
+    return {"status": "ok", "phase": "3"}

@@ -30,4 +30,13 @@ def send_email_task(to: str, subject: str, body: str) -> dict:
 @celery_app.task(name="process_domain_event")
 def process_domain_event_task(event_name: str, aggregate_id: str, payload: dict) -> dict:
     logger.info("Processing event %s for %s", event_name, aggregate_id)
+    if event_name in ("OrderCreatedEvent", "PaymentConfirmedEvent", "OrderPaidEvent"):
+        email = payload.get("customer_email") or payload.get("email")
+        if email:
+            subject = {
+                "OrderCreatedEvent": "Pedido confirmado",
+                "PaymentConfirmedEvent": "Pagamento aprovado",
+                "OrderPaidEvent": "Pedido pago",
+            }.get(event_name, "Atualização do pedido")
+            send_email_task.delay(str(email), subject, f"Evento {event_name} — pedido {aggregate_id}")
     return {"event": event_name, "aggregate_id": aggregate_id, "payload": payload}
