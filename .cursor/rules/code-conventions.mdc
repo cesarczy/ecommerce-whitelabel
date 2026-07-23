@@ -1,0 +1,41 @@
+---
+description: Convenções de código TypeScript, naming e qualidade
+globs: **/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Convenções de Código
+
+## TypeScript
+
+- `strict: true` no tsconfig
+- Preferir `interface` para DTOs; `type` para unions
+- Evitar `any`; usar `unknown` + narrowing
+- Exports nomeados; default export só em pages React
+
+## Naming
+
+| Elemento | Padrão | Exemplo |
+|----------|--------|---------|
+| Aggregate | PascalCase | `Order` |
+| Value Object | PascalCase + `.vo.ts` | `Money` |
+| Use Case | VerbNoun + `.use-case.ts` | `CreateOrderUseCase` |
+| Repository port | Noun + `Repository` | `OrderRepository` |
+| Event | Past tense | `OrderPlacedEvent` |
+| Error | `DomainError` / `NotFoundError` | — |
+
+## Funções
+
+- Máx. ~30 linhas por função; extrair se maior
+- Early return para guards
+- Sem comentários óbvios; comentar invariantes não evidentes
+
+## Imports
+
+Ordem: externos → shared → módulo atual (domain → application → infra)
+
+## Testes
+
+- Domínio: testes unitários puros, sem mocks
+- Use cases: mock de ports
+- E2E: fluxos críticos apenas

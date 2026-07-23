@@ -1,0 +1,46 @@
+---
+description: Mapeamento ORM ↔ Domínio com mappers explícitos
+globs: src/**/infrastructure/**/*
+alwaysApply: false
+---
+
+# ORM Mapping
+
+## Mapper dedicado por agregado
+
+```typescript
+export class OrderMapper {
+  static toDomain(raw: PrismaOrderWithItems): Order {
+    return Order.reconstitute({
+      id: OrderId.create(raw.id),
+      status: OrderStatus.create(raw.status),
+      items: raw.items.map(OrderItemMapper.toDomain),
+    });
+  }
+
+  static toPersistence(order: Order): Prisma.OrderCreateInput {
+    return {
+      id: order.id.toString(),
+      status: order.status.toString(),
+      items: { create: order.items.map(OrderItemMapper.toPersistence) },
+    };
+  }
+}
+```
+
+## Regras
+
+- Mapper é função/classe **stateless**
+- Conversão enum/string ↔ Value Object sempre explícita
+- Repositório usa mapper; nunca expõe Prisma model para fora
+- Testes unitários para mappers com casos edge (null, defaults)
+
+## Localização
+
+`src/modules/<context>/infrastructure/persistence/<aggregate>.mapper.ts`
+
+## Anti-padrões
+
+- Spread `...prismaModel` direto no construtor de domínio
+- Lógica de negócio no mapper
+- Mapper compartilhado entre contextos diferentes

@@ -1,0 +1,27 @@
+checks:
+  layer_dependencies:
+    enabled: true
+  forbidden_imports_in_domain:
+    enabled: true
+    patterns:
+      - "@prisma/client"
+      - "express"
+      - "fastify"
+      - "react"
+      - "next"
+  required_structure:
+    enabled: true
+    paths:
+      - specs/
+      - .cursor/rules/
+      - prompts/master-prompt.md
+      - harness/scripts/run-harness.sh
+  prisma_isolation:
+    enabled: true
+  spec_completeness:
+    enabled: true
+    expected_specs: 12
+
+report:
+  format: text
+  fail_fast: false

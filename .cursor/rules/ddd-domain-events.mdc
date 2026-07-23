@@ -1,0 +1,41 @@
+---
+description: Domain Events para comunicação intra e inter-contexto
+globs: src/**/domain/**/*
+alwaysApply: false
+---
+
+# DDD — Domain Events
+
+## Quando emitir
+
+- Algo relevante ao negócio **já ocorreu** no passado
+- Nome no passado: `OrderPlaced`, `PaymentConfirmed`, `StockReserved`
+
+## Estrutura
+
+```typescript
+export class OrderPlacedEvent implements DomainEvent {
+  readonly occurredAt = new Date();
+  constructor(
+    readonly aggregateId: OrderId,
+    readonly payload: { customerId: string; total: Money },
+  ) {}
+}
+```
+
+## Regras
+
+- Eventos nascem **dentro** do agregado; coletados antes do commit
+- Agregado não publica diretamente — application layer despacha após persistência
+- Handlers em `application/event-handlers/` ou módulo de integração
+
+## Integração entre contextos
+
+- Preferir eventos assíncronos a chamadas síncronas cross-context
+- Payload mínimo: IDs + dados necessários para reação
+
+## Anti-padrões
+
+- Evento genérico `EntityChanged`
+- Handler com lógica de negócio do agregado origem
+- Publicar antes de persistir (risco de inconsistência)

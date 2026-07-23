@@ -1,0 +1,39 @@
+---
+description: Agregados DDD — raiz, invariantes, limites transacionais
+globs: src/**/domain/**/*
+alwaysApply: false
+---
+
+# DDD — Aggregates
+
+## Estrutura
+
+- **Aggregate Root**: único ponto de entrada externo
+- Entidades filhas acessíveis só via root
+- Referências a outros agregados por **ID**, não por referência de objeto
+
+## Invariantes
+
+- Validar no construtor/factory e em métodos de mutação
+- Estado inválido = exceção de domínio (`DomainError`)
+
+```typescript
+class Order {
+  private constructor(private readonly props: OrderProps) {
+    if (props.items.length === 0) throw new DomainError('Order must have items');
+  }
+
+  static create(props: OrderProps): Order { ... }
+  addItem(item: OrderItem): void { ... }
+}
+```
+
+## Tamanho
+
+- Preferir agregados pequenos (1 root + poucas entidades)
+- Consistência eventual entre agregados via domain events
+
+## Persistência
+
+- Um repositório por aggregate root
+- Métodos: `save(aggregate)`, `findById(id)` — retornam agregado completo

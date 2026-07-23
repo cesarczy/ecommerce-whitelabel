@@ -1,0 +1,45 @@
+---
+description: Backend — handlers HTTP, DI, error mapping, observabilidade
+globs: src/**/{infrastructure,presentation}/**/*
+alwaysApply: false
+---
+
+# Backend Development
+
+## Stack sugerida
+
+- Runtime: Node.js + TypeScript
+- HTTP: Express/Fastify (adapter fino)
+- DI: construtor manual ou tsyringe/inversify
+- ORM: Prisma (camada infrastructure)
+
+## Controller / Handler
+
+- Valida input (schema Zod/class-validator)
+- Chama use case
+- Mapeia output → HTTP response
+- Mapeia DomainError → 4xx, erros inesperados → 5xx
+
+```typescript
+try {
+  const result = await this.useCase.execute(input);
+  return res.status(201).json(result);
+} catch (e) {
+  if (e instanceof DomainError) return res.status(422).json({ error: e.message });
+  throw e;
+}
+```
+
+## Bootstrap (`src/main.ts`)
+
+1. Carregar config
+2. Instanciar adapters concretos
+3. Wire use cases
+4. Registrar routes
+5. Start server
+
+## Observabilidade
+
+- Correlation ID por request
+- Logs estruturados (JSON)
+- Métricas em handlers críticos

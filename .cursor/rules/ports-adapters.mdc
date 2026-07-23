@@ -1,0 +1,41 @@
+---
+description: Ports & Adapters — interfaces na application, implementação na infra
+globs: src/**/*
+alwaysApply: false
+---
+
+# Ports & Adapters
+
+## Ports (interfaces)
+
+Local: `src/application/ports/`
+
+- `OrderRepository`, `PaymentGateway`, `EventBus`, `Clock`
+- Apenas assinaturas; zero implementação
+
+## Adapters (implementações)
+
+Local: `src/infrastructure/` ou `src/presentation/`
+
+| Port | Adapter típico |
+|------|----------------|
+| OrderRepository | PrismaOrderRepository |
+| PaymentGateway | StripePaymentAdapter |
+| EventBus | InMemoryEventBus / RabbitMQ |
+| HttpController | ExpressOrderController |
+
+## Inversão de dependência
+
+```typescript
+// presentation/http/order.controller.ts
+export class OrderController {
+  constructor(private readonly createOrder: CreateOrderUseCase) {}
+
+  async handle(req: Request, res: Response) {
+    const result = await this.createOrder.execute(req.body);
+    res.status(201).json(result);
+  }
+}
+```
+
+Controller conhece use case; use case **não** conhece Express.

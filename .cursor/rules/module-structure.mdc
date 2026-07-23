@@ -1,0 +1,50 @@
+---
+description: Estruturação de módulos por bounded context e camada
+globs: src/**/*
+alwaysApply: false
+---
+
+# Estrutura de Módulos
+
+## Layout por módulo (bounded context)
+
+```
+src/modules/orders/
+├── domain/
+│   ├── order.aggregate.ts
+│   ├── order-item.entity.ts
+│   ├── value-objects/
+│   ├── events/
+│   └── errors/
+├── application/
+│   ├── use-cases/
+│   ├── ports/
+│   └── dtos/
+├── infrastructure/
+│   ├── persistence/
+│   │   ├── prisma-order.repository.ts
+│   │   └── order.mapper.ts
+│   └── messaging/
+└── presentation/
+    └── http/
+        └── order.controller.ts
+```
+
+## Arquivos barrel (index.ts)
+
+- Um por pasta; reexporta API pública do módulo
+- Domínio externo importa só barrels ou ports — nunca internals
+
+## Shared kernel (mínimo)
+
+```
+src/shared/
+├── domain/       # BaseEntity, DomainEvent, DomainError
+└── application/  # EventBus interface, Pagination
+```
+
+## Naming
+
+- Arquivos: `kebab-case.tipo.ts` (`create-order.use-case.ts`)
+- Classes: `PascalCase`
+- Interfaces de port: sem prefixo `I` (preferir `OrderRepository`)

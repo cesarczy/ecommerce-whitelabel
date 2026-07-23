@@ -1,0 +1,44 @@
+---
+description: Use Cases — orquestração de application layer sem lógica de infra
+globs: src/**/application/**/*
+alwaysApply: false
+---
+
+# Use Cases (Application Services)
+
+## Um use case = uma ação do usuário/sistema
+
+```
+CreateOrderUseCase
+CancelOrderUseCase
+GetOrderByIdUseCase
+```
+
+## Estrutura
+
+```typescript
+export class CreateOrderUseCase {
+  constructor(
+    private readonly orderRepo: OrderRepository,
+    private readonly eventBus: EventBus,
+  ) {}
+
+  async execute(input: CreateOrderInput): Promise<CreateOrderOutput> {
+    const order = Order.create({ ... });
+    await this.orderRepo.save(order);
+    await this.eventBus.publishAll(order.pullDomainEvents());
+    return { orderId: order.id.toString() };
+  }
+}
+```
+
+## Regras
+
+- Input/Output tipados (DTOs) — nunca Request/Response HTTP
+- Orquestra domínio; não contém regras de negócio complexas
+- Transação gerenciada aqui ou via Unit of Work
+- Dependências injetadas via construtor (interfaces)
+
+## Localização
+
+`src/application/use-cases/<verb>-<noun>.use-case.ts`

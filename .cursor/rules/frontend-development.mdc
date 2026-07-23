@@ -1,0 +1,39 @@
+---
+description: Frontend — UI desacoplada, consome API via application layer client
+globs: frontend/**/*,src/**/presentation/**/*
+alwaysApply: false
+---
+
+# Frontend Development
+
+## Camadas no frontend
+
+```
+frontend/src/
+├── app/              # Routes, layout, providers
+├── features/         # Feature slices (UI + hooks + API client)
+├── shared/
+│   ├── ui/           # Componentes dumb reutilizáveis
+│   ├── api/          # HTTP client, tipos de API
+│   └── lib/
+└── entities/         # Tipos/view-models (não domínio server)
+```
+
+## Regras
+
+- UI **não** contém regras de negócio do servidor
+- Validação client = UX; validação autoritativa = backend
+- Hooks (`useCreateOrder`) encapsulam chamadas API + estado
+- Componentes de apresentação recebem props; containers usam hooks
+
+## Integração com backend
+
+- Contratos tipados compartilhados ou gerados (OpenAPI)
+- Erros de domínio mapeados para mensagens user-friendly
+- Loading/error/empty states explícitos
+
+## Anti-padrões
+
+- Lógica de cálculo de preço/desconto só no frontend
+- Acesso direto a Prisma ou banco
+- Componentes God com fetch + render + business rules

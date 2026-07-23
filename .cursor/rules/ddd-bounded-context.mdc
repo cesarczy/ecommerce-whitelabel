@@ -1,0 +1,39 @@
+---
+description: Bounded Contexts, context map e modularização por domínio
+globs: src/**/*
+alwaysApply: false
+---
+
+# DDD — Bounded Context
+
+## Regras
+
+- Cada contexto delimitado = módulo ou pacote top-level
+- Modelos com mesmo nome em contextos diferentes são **distintos**
+- Integração entre contextos via ACL, eventos ou APIs publicadas — nunca import direto de domínio alheio
+
+## Nomenclatura
+
+```
+src/modules/
+├── billing/
+│   ├── domain/
+│   ├── application/
+│   └── infrastructure/
+└── catalog/
+    ├── domain/
+    ...
+```
+
+## Context Map (artefato)
+
+Documentar em `docs/context-map.md`:
+- Contextos e responsabilidades
+- Relacionamentos: Partnership, Customer-Supplier, Conformist, ACL, Shared Kernel
+- Eventos ou contratos de integração
+
+## Anti-padrões
+
+- God module com tudo misturado
+- Entidade `User` compartilhada entre todos os contextos sem tradução
+- Queries cross-context via JOIN direto no banco

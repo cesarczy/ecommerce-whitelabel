@@ -1,0 +1,31 @@
+---
+description: Princípios fundamentais Clean Architecture + DDD — aplica em toda sessão
+alwaysApply: true
+---
+
+# Princípios Core
+
+## Regra de dependência
+
+- Código fonte só aponta para **dentro** (domínio no centro)
+- Camadas externas dependem das internas; nunca o contrário
+
+## Camadas (de dentro para fora)
+
+1. **Domain** — entidades, VOs, agregados, eventos, exceções de domínio
+2. **Application** — use cases, DTOs de entrada/saída, portas
+3. **Infrastructure** — Prisma, repositórios, mensageria, APIs externas
+4. **Presentation** — controllers, routes, components, pages
+
+## DDD
+
+- Um agregado = uma unidade de consistência transacional
+- Invariantes validadas **dentro** do agregado
+- Repositório persiste agregados inteiros, não tabelas soltas
+- Linguagem ubíqua nos nomes de classes, métodos e pastas
+
+## Proibições
+
+- Domínio importando `@prisma/client`, Express, React ou HTTP
+- Lógica de negócio em controllers ou componentes UI
+- Entidades anêmicas (só getters/setters)

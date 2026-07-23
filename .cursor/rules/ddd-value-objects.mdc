@@ -1,0 +1,44 @@
+---
+description: Value Objects imutáveis com validação e igualdade por valor
+globs: src/**/domain/**/*
+alwaysApply: false
+---
+
+# DDD — Value Objects
+
+## Características
+
+- Imutáveis após criação
+- Igualdade por **valor** (todos os atributos), não referência
+- Encapsulam validação e formatação
+
+## Padrão
+
+```typescript
+export class Email {
+  private constructor(private readonly value: string) {}
+
+  static create(raw: string): Email {
+    const normalized = raw.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) {
+      throw new DomainError('Invalid email');
+    }
+    return new Email(normalized);
+  }
+
+  toString(): string { return this.value; }
+  equals(other: Email): boolean { return this.value === other.value; }
+}
+```
+
+## Quando usar VO vs primitivo
+
+| Use VO | Use primitivo |
+|--------|---------------|
+| Email, CPF, Money, Address | flags booleanas simples |
+| Regras de validação complexas | IDs internos opacos |
+| Comportamento de formatação | contadores internos |
+
+## Localização
+
+`src/domain/<context>/value-objects/<name>.vo.ts`

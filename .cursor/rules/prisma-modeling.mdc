@@ -1,0 +1,44 @@
+---
+description: Modelagem Prisma alinhada a agregados e bounded contexts
+globs: prisma/**/*
+alwaysApply: false
+---
+
+# Prisma Modeling
+
+## Princípios
+
+- Schema reflete **persistência**, não modelo de domínio 1:1
+- Tabelas agrupadas por bounded context quando possível
+- IDs: `@id @default(uuid())` ou cuid conforme padrão do projeto
+
+## Agregados → tabelas
+
+```
+model Order {
+  id        String      @id @default(uuid())
+  status    OrderStatus
+  items     OrderItem[]
+  createdAt DateTime    @default(now())
+  @@map("orders")
+}
+
+model OrderItem {
+  id       String @id @default(uuid())
+  orderId  String
+  order    Order  @relation(fields: [orderId], references: [id])
+  ...
+}
+```
+
+## Regras
+
+- Cascade delete coerente com limites de agregado
+- Enums Prisma para estados persistidos (mapear para VOs no domínio)
+- Migrations versionadas; nunca editar migration aplicada
+- Índices em FKs e campos de busca frequente
+
+## Separação
+
+- `prisma/schema.prisma` — única fonte de schema
+- Domínio **nunca** importa tipos gerados pelo Prisma Client

@@ -1,0 +1,42 @@
+---
+description: Organização de camadas Clean Architecture e regra de dependência
+globs: src/**/*
+alwaysApply: false
+---
+
+# Clean Architecture — Camadas
+
+## Estrutura de pastas
+
+```
+src/
+├── domain/           # Entidades, VOs, agregados, eventos
+├── application/      # Use cases, ports (interfaces)
+├── infrastructure/   # Repositórios, Prisma, adapters externos
+└── presentation/     # HTTP handlers, CLI, UI adapters
+```
+
+## Dependências permitidas
+
+```
+presentation → application → domain
+infrastructure → application → domain
+```
+
+## Checklist por arquivo
+
+- [ ] Arquivo está na camada correta?
+- [ ] Imports respeitam a direção?
+- [ ] Interfaces (ports) definidas em `application/ports/`?
+- [ ] Implementações concretas apenas em `infrastructure/`
+
+## Exemplo
+
+```typescript
+// ✅ application/use-cases/create-order.use-case.ts
+import { OrderRepository } from '../ports/order.repository';
+import { Order } from '../../domain/order/order.aggregate';
+
+// ❌ domain/order/order.aggregate.ts
+import { PrismaClient } from '@prisma/client'; // PROIBIDO
+```

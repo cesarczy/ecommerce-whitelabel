@@ -1,0 +1,39 @@
+---
+description: Repository pattern — portas no application, implementação na infra
+globs: src/**/*
+alwaysApply: false
+---
+
+# DDD — Repositories
+
+## Porta (application/ports/)
+
+```typescript
+export interface OrderRepository {
+  save(order: Order): Promise<void>;
+  findById(id: OrderId): Promise<Order | null>;
+}
+```
+
+## Implementação (infrastructure/persistence/)
+
+- Usa Prisma/ORM internamente
+- **Mapper** explícito: `OrderMapper.toDomain(prismaModel)` / `toPersistence(order)`
+
+## Regras
+
+- Repositório retorna agregados de domínio, nunca modelos Prisma
+- Um repositório por aggregate root
+- Queries complexas de leitura → considerar CQRS (read models separados)
+
+## Métodos permitidos
+
+- `save`, `findById`, `delete` (quando necessário)
+- Evitar `findAll` sem paginação em produção
+- Specifications/criteria para filtros reutilizáveis
+
+## Anti-padrões
+
+- `IRepository<T>` genérico com CRUD para tudo
+- Repositório retornando DTO ou entidade Prisma
+- Lógica de negócio dentro do repositório
