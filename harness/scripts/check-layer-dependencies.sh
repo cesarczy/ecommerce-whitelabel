@@ -1,18 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-FORBIDDEN='@prisma/client|from ['\''"]express|from ['\''"]fastify|from ['\''"]react|from ['\''"]next'
+FORBIDDEN='sqlalchemy|fastapi|redis|celery|minio|asyncpg'
 VIOLATIONS=0
-DOMAIN_DIRS=$(find "$ROOT/src" -type d -name domain 2>/dev/null || true)
-[ -z "$DOMAIN_DIRS" ] && { echo "  (sem domain — OK)"; exit 0; }
-while IFS= read -r dir; do
-  if rg -l "$FORBIDDEN" "$dir" --glob '*.ts' --glob '*.tsx' 2>/dev/null; then
-    echo "  VIOLAÇÃO: import proibido em $dir"; VIOLATIONS=$((VIOLATIONS + 1))
-  fi
-  if rg -l "from ['\"].*infrastructure" "$dir" --glob '*.ts' 2>/dev/null; then
-    echo "  VIOLAÇÃO: domain importa infrastructure em $dir"; VIOLATIONS=$((VIOLATIONS + 1))
-  fi
-done <<< "$DOMAIN_DIRS"
+
+if [ -d "$ROOT/backend/app/domain" ]; then
+  while IFS= read -r file; do
+    echo "  VIOLAÇÃO: import proibido em $file"; VIOLATIONS=$((VIOLATIONS + 1))
+  done < <(rg -l "$FORBIDDEN" "$ROOT/backend/app/domain" --glob '*.py' 2>/dev/null || true)
+  while IFS= read -r file; do
+    echo "  VIOLAÇÃO: domain importa infra em $file"; VIOLATIONS=$((VIOLATIONS + 1))
+  done < <(rg -l "from app\.infra|import app\.infra" "$ROOT/backend/app/domain" --glob '*.py' 2>/dev/null || true)
+fi
+
+if [ -d "$ROOT/src" ]; then
+  bash "$ROOT/harness/scripts/check-layer-dependencies.sh" || VIOLATIONS=$((VIOLATIONS + 1))
+fi
+
 [ "$VIOLATIONS" -gt 0 ] && exit 1
 echo "  Layer dependencies OK"
 exit 0

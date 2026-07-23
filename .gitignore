@@ -1,14 +1,39 @@
+# Dependencies
 node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
 dist/
+build/
+
+# Environment
 .env
 .env.local
 *.log
+
+# IDE / OS
 .DS_Store
+.idea/
+.vscode/
+
+# Test / coverage
 coverage/
-.prisma/
-src/
-frontend/
-prisma/migrations/
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Angular
+frontend/.angular/
+frontend/dist/
+
+# Database
+*.db
+
+# Uploads / local storage
 uploads/
 
 # Books (large binaries — keep external)

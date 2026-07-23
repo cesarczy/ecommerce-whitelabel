@@ -1,0 +1,58 @@
+export const API_URL = 'http://localhost:8000/api/v1';
+
+export interface TokenResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  expires_in: number;
+}
+
+export interface UserResponse {
+  id: string;
+  email: string;
+  full_name: string;
+  phone: string | null;
+  email_verified: boolean;
+  roles: string[];
+}
+
+export interface ProductResponse {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  sku: string;
+  price: string;
+  currency: string;
+  status: string;
+  category_id: string;
+  image_url: string | null;
+}
+
+export interface CartResponse {
+  id: string;
+  items: CartItemResponse[];
+  subtotal: string;
+  item_count: number;
+}
+
+export interface CartItemResponse {
+  id: string;
+  product_id: string;
+  sku: string;
+  product_name: string;
+  unit_price: string;
+  quantity: number;
+  line_total: string;
+}
+
+export interface OrderResponse {
+  id: string;
+  order_number: string;
+  status: string;
+  subtotal: string;
+  discount: string;
+  shipping_cost: string;
+  total: string;
+  items: CartItemResponse[];
+}

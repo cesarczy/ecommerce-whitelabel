@@ -1,52 +1,87 @@
-# Cursor Clean Architecture + DDD Kit
+# E-commerce Whitelabel
 
-Framework de desenvolvimento assistido por IA baseado em **Clean Architecture** (Robert C. Martin) e **Implementing Domain-Driven Design** (Vaughn Vernon).
+Plataforma e-commerce modular com identidade configurável (whitelabel), construída com **Clean Architecture**, **DDD** e pipeline de 12 specs.
 
-Transforma padrões arquiteturais em **Rules**, **Prompts**, **Specs** e **Harness** para execução previsível no Cursor, Codex e assistentes compatíveis.
+## Stack
+
+| Camada | Tecnologias |
+|--------|-------------|
+| Backend | FastAPI, SQLAlchemy 2.0, Alembic, PostgreSQL, Redis, JWT (Argon2) |
+| Frontend | Angular 20, Angular Material, NGXS, TailwindCSS |
+| Infra | Docker Compose (PostgreSQL, Redis, RabbitMQ, MinIO) |
+
+## Quick start
+
+```bash
+# 1. Infraestrutura
+docker compose -f docker/docker-compose.yml up -d
+
+# 2. Backend
+cd backend
+python -m venv .venv && source .venv/bin/activate
+pip install -e ".[dev]"
+cp .env.example .env
+uvicorn app.main:app --reload
+
+# 3. Frontend (Node.js 20+)
+cd frontend
+npm install
+npm start
+```
+
+- API: http://localhost:8000/docs  
+- App: http://localhost:4200
 
 ## Estrutura
 
 ```
-cursor-clean-ddd-kit/
-├── .cursor/
-│   ├── rules/              # 15 regras especializadas por padrão
-│   └── skills/             # Skill do pipeline de specs
-├── prompts/                # Prompt mestre (dispara as 12 specs)
-├── specs/                  # 12 especificações sequenciais
-├── harness/                # Validação automatizada de arquitetura
-├── docs/                   # Documentação e mapeamento de padrões
-├── templates/              # Scaffolds reutilizáveis
-└── references/             # Fontes bibliográficas
+ecommerce-whitelabel/
+├── backend/          # FastAPI — Clean Architecture
+├── frontend/         # Angular 20 SPA
+├── docker/           # Compose dev
+├── docs/             # Discovery, context map, harness report
+├── specs/            # 12 specs DDD
+└── harness/          # Validação arquitetural
 ```
 
-## Fluxo de uso
+## Documentação
 
-1. Copie este kit para seu projeto (ou abra como base).
-2. Execute o prompt mestre: `prompts/master-prompt.md`
-3. O agente executa as **12 specs em sequência** (01 → 12).
-4. Ao final, rode o harness: `./harness/scripts/run-harness.sh`
-5. Corrija violações reportadas e revalide até passar.
+| Doc | Conteúdo |
+|-----|----------|
+| [Discovery](docs/discovery.md) | Requisitos, MVP, stack |
+| [Glossário](docs/glossary.md) | Linguagem ubíqua |
+| [Context Map](docs/context-map.md) | Bounded contexts |
+| [Domain Model](docs/domain-model.md) | Agregados |
+| [Ports & Adapters](docs/ports-adapters.md) | Interfaces e adapters |
+| [Database Schema](docs/database-schema.md) | SQLAlchemy + Alembic |
+| [DI Plan](docs/di-plan.md) | Wiring FastAPI |
+| [Harness Report](docs/harness-report.md) | Validação final |
 
-## As 12 Specs
+## Pipeline de specs
 
-| # | Spec | Objetivo |
-|---|------|----------|
-| 01 | project-discovery | Contexto, requisitos, glossário |
-| 02 | bounded-context | Contextos delimitados e mapa |
-| 03 | domain-model | Entidades, VOs, agregados, eventos |
-| 04 | use-cases | Casos de uso e portas de entrada |
-| 05 | ports-adapters | Portas, adaptadores, inversão de dependência |
-| 06 | module-structure | Estrutura de pastas e módulos |
-| 07 | prisma-schema | Modelagem relacional com Prisma |
-| 08 | backend | Implementação da camada de aplicação/infra |
-| 09 | frontend | UI, state, integração com API |
-| 10 | integration | Wiring, DI, composição de módulos |
-| 11 | testing | Testes por camada e contrato |
-| 12 | validation | Harness final e checklist de entrega |
+| Spec | Status |
+|------|--------|
+| 01–12 | ✅ Concluídas |
 
-## Fontes
+Validação: `./harness/scripts/run-harness.sh`
 
-- *Clean Architecture* — Robert C. Martin
-- *Implementing Domain-Driven Design* — Vaughn Vernon
+## Arquitetura backend
 
-Ver `references/` e `docs/sources/`.
+```
+backend/app/
+├── core/           # Config, security, database
+├── domain/         # Entidades, VOs, agregados
+├── application/    # Use cases, DTOs, ports
+├── infra/          # Repositories, mappers, ORM
+└── api/            # Routers REST v1
+```
+
+## Testes
+
+```bash
+cd backend && pytest tests/ --cov=app
+```
+
+## Licença
+
+Projeto privado.

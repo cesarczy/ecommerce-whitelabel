@@ -31,16 +31,13 @@ RULE_COUNT=$(find .cursor/rules -name '*.mdc' 2>/dev/null | wc -l)
 if [ "$RULE_COUNT" -ge 10 ]; then pass "$RULE_COUNT rules configuradas"; else warn "Poucas rules ($RULE_COUNT)"; fi
 
 echo "── Layer Dependencies ──"
-if [ -d "src" ]; then bash "$ROOT/harness/scripts/check-layer-dependencies.sh" || FAILURES=$((FAILURES + 1))
-else warn "src/ não encontrado — skip (implemente via specs)"; fi
+bash "$ROOT/harness/scripts/check-layer-dependencies.sh" || FAILURES=$((FAILURES + 1))
 
 echo "── DDD Compliance ──"
-if [ -d "src" ]; then bash "$ROOT/harness/scripts/check-ddd-compliance.sh" || FAILURES=$((FAILURES + 1))
-else warn "src/ não encontrado — skip"; fi
+bash "$ROOT/harness/scripts/check-ddd-compliance.sh" || FAILURES=$((FAILURES + 1))
 
-echo "── Prisma Isolation ──"
-if [ -d "src" ]; then bash "$ROOT/harness/scripts/check-prisma-schema.sh" || FAILURES=$((FAILURES + 1))
-else warn "src/ não encontrado — skip"; fi
+echo "── ORM Isolation ──"
+bash "$ROOT/harness/scripts/check-prisma-schema.sh" || FAILURES=$((FAILURES + 1))
 
 echo "── Architecture ──"
 bash "$ROOT/harness/scripts/check-architecture.sh" || FAILURES=$((FAILURES + 1))
