@@ -1,15 +1,30 @@
-from pydantic import BaseModel, EmailStr, Field
+from typing import Annotated
+
+from pydantic import BaseModel, BeforeValidator, Field
+
+from app.domain.shared.exceptions import DomainError
+from app.domain.shared.value_objects.email import Email
+
+
+def _validate_app_email(value: str) -> str:
+    try:
+        return str(Email.create(value))
+    except DomainError as exc:
+        raise ValueError(str(exc)) from exc
+
+
+AppEmail = Annotated[str, BeforeValidator(_validate_app_email)]
 
 
 class RegisterUserInput(BaseModel):
-    email: EmailStr
+    email: AppEmail
     full_name: str = Field(min_length=2, max_length=120)
     password: str = Field(min_length=8, max_length=128)
     phone: str | None = None
 
 
 class LoginUserInput(BaseModel):
-    email: EmailStr
+    email: AppEmail
     password: str
 
 
@@ -53,6 +68,12 @@ class CreateProductInput(BaseModel):
     category_id: str
     brand_id: str | None = None
     tags: list[str] = Field(default_factory=list)
+
+
+class CategoryOutput(BaseModel):
+    id: str
+    name: str
+    slug: str
 
 
 class ProductOutput(BaseModel):
@@ -239,7 +260,7 @@ class ProductVideoOutput(BaseModel):
 
 
 class ForgotPasswordInput(BaseModel):
-    email: EmailStr
+    email: AppEmail
 
 
 class ResetPasswordInput(BaseModel):

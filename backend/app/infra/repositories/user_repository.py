@@ -21,9 +21,9 @@ class SqlAlchemyUserRepository(UserRepository):
             .where(UserModel.id == user.id.value)
         )
         model = result.scalar_one_or_none()
-        if model is None:
+        is_new = model is None
+        if is_new:
             model = user_to_model(user)
-            self._session.add(model)
         else:
             user_to_model(user, model)
 
@@ -31,8 +31,11 @@ class SqlAlchemyUserRepository(UserRepository):
         roles_result = await self._session.execute(select(RoleModel).where(RoleModel.name.in_(role_names)))
         model.roles = list(roles_result.scalars().all())
 
-        existing_addresses = {str(a.id): a for a in model.addresses}
-        model.addresses.clear()
+        existing_addresses: dict[str, object] = {}
+        if not is_new:
+            existing_addresses = {str(a.id): a for a in model.addresses}
+            model.addresses.clear()
+
         for address in user.addresses:
             addr_model = existing_addresses.get(str(address.id.value))
             if addr_model is None:
@@ -50,6 +53,9 @@ class SqlAlchemyUserRepository(UserRepository):
             addr_model.is_default = address.is_default
             addr_model.created_at = address.created_at
             model.addresses.append(addr_model)
+
+        if is_new:
+            self._session.add(model)
 
         await self._session.flush()
 

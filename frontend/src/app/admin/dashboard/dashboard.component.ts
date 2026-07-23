@@ -8,7 +8,7 @@ import { AnalyticsResponse } from '@core/models/api.models';
   standalone: true,
   imports: [MatCardModule],
   template: `
-    <h2 class="text-2xl font-medium mb-4">Dashboard Admin</h2>
+    <h2 class="text-xl font-medium mb-4">Dashboard</h2>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
       @for (item of stats(); track item.label) {
         <mat-card class="p-4 text-center">

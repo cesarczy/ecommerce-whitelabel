@@ -1,12 +1,20 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_create_product, get_list_products, get_publish_product, require_staff
+from app.api.deps import get_create_product, get_list_products, get_publish_product, get_session, require_staff
 from app.application.commands.products import CreateProductUseCase, ListProductsUseCase, PublishProductUseCase
-from app.application.dto.schemas import CreateProductInput, ProductOutput
+from app.application.dto.schemas import CategoryOutput, CreateProductInput, ProductOutput
+from app.infra.repositories.category_repository import list_categories
 
 router = APIRouter(prefix="/products", tags=["Products"])
+
+
+@router.get("/categories", response_model=list[CategoryOutput])
+async def list_product_categories(session: AsyncSession = Depends(get_session)):
+    categories = await list_categories(session)
+    return [CategoryOutput(id=str(c.id), name=c.name, slug=c.slug) for c in categories]
 
 
 @router.get("", response_model=list[ProductOutput])

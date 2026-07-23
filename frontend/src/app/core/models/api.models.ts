@@ -31,6 +31,12 @@ export interface ProductResponse {
   seo_description?: string | null;
 }
 
+export interface CategoryResponse {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export interface CartResponse {
   id: string;
   items: CartItemResponse[];

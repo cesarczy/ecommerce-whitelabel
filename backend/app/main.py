@@ -14,6 +14,7 @@ from app.core.middlewares.request_id import RequestIdMiddleware
 from app.core.middlewares.tenant import TenantMiddleware
 from app.domain.shared.exceptions import DomainError
 from app.infra.models.models import TenantModel
+from app.infra.repositories.category_repository import seed_default_category
 from app.infra.repositories.tenant_repository import seed_default_tenant
 from app.infra.repositories.user_repository import seed_default_admin, seed_default_roles
 
@@ -34,6 +35,7 @@ async def lifespan(app: FastAPI):
     async with SessionLocal() as session:
         await seed_default_roles(session)
         await seed_default_tenant(session)
+        await seed_default_category(session)
         await seed_default_admin(session)
         await session.commit()
     app.state.tenant_resolver = resolve_tenant

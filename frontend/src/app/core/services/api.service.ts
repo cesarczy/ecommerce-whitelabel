@@ -7,6 +7,7 @@ import {
   API_URL,
   BannerResponse,
   CartResponse,
+  CategoryResponse,
   CouponResponse,
   MfaEnrollResponse,
   OrderResponse,
@@ -53,6 +54,33 @@ export class ApiService {
 
   listProducts(): Observable<ProductResponse[]> {
     return this.http.get<ProductResponse[]>(`${this.base}/products`);
+  }
+
+  listCategories(): Observable<CategoryResponse[]> {
+    return this.http.get<CategoryResponse[]>(`${this.base}/products/categories`);
+  }
+
+  createProduct(body: {
+    name: string;
+    description: string;
+    sku: string;
+    price: string;
+    category_id: string;
+  }): Observable<ProductResponse> {
+    return this.http.post<ProductResponse>(`${this.base}/products`, body);
+  }
+
+  uploadProductImage(productId: string, file: File): Observable<{ storage_key: string; url: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ storage_key: string; url: string }>(`${this.base}/products/${productId}/upload`, formData);
+  }
+
+  publishProduct(productId: string, imageKey: string): Observable<ProductResponse> {
+    return this.http.post<ProductResponse>(
+      `${this.base}/products/${productId}/publish?image_key=${encodeURIComponent(imageKey)}`,
+      {},
+    );
   }
 
   getProductBySlug(slug: string): Observable<ProductResponse> {

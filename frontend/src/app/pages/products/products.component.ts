@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { AsyncPipe, CurrencyPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,17 +8,28 @@ import { Store } from '@ngxs/store';
 
 import { ApiService } from '@core/services/api.service';
 import { ProductResponse } from '@core/models/api.models';
+import { AuthState } from '@core/state/auth.state';
 import { CartState, SetCart } from '@core/state/cart.state';
 
 @Component({
   standalone: true,
-  imports: [CurrencyPipe, MatCardModule, MatButtonModule, MatProgressSpinnerModule, RouterLink],
+  imports: [
+    AsyncPipe,
+    CurrencyPipe,
+    MatCardModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    RouterLink,
+  ],
   template: `
     <h2 class="text-2xl font-medium mb-4">Catálogo</h2>
     @if (loading()) {
       <mat-spinner diameter="40" />
     } @else if (products().length === 0) {
-      <p class="text-gray-500">Nenhum produto disponível.</p>
+      <p class="text-gray-500 mb-3">Nenhum produto disponível.</p>
+      @if (isStaffOrAdmin$ | async) {
+        <a mat-raised-button color="primary" routerLink="/admin/products">Cadastrar produto</a>
+      }
     } @else {
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         @for (product of products(); track product.id) {
@@ -39,6 +50,7 @@ import { CartState, SetCart } from '@core/state/cart.state';
 export class ProductsComponent implements OnInit {
   private readonly api = inject(ApiService);
   private readonly store = inject(Store);
+  readonly isStaffOrAdmin$ = this.store.select(AuthState.isStaffOrAdmin);
 
   products = signal<ProductResponse[]>([]);
   loading = signal(true);
